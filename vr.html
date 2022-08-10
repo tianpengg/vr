@@ -1,0 +1,61 @@
+<head>
+  <meta charset="utf-8">
+  <title>全景图</title>
+  <style>
+    #viewer {
+      width: 1000px;
+      height: 500px;
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.min.css" />
+</head>
+
+<body>
+  <div id="viewer"></div>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/three/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/uevent@2/browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4.7.0/dist/plugins/autorotate-keypoints.js"></script>
+
+<script>
+  var viewer = new PhotoSphereViewer.Viewer({
+    container: document.querySelector('#viewer'),
+    adapter: PhotoSphereViewer.EquirectangularTilesAdapter,
+    panorama: 'https://qd-vr.oss-cn-qingdao.aliyuncs.com/slr.jpg',
+    size: {
+      width: "100%",
+      height: "100%",
+    },
+    loadingImg: 'https://qd-vr.oss-cn-qingdao.aliyuncs.com/photosphere-logo.gif',
+    navbar: [
+      'autorotate',
+      'zoom',
+      'caption',
+      'fullscreen',
+    ],
+  });
+
+  viewer.on('ready', intro);
+  function intro () {
+
+    viewer.renderer.camera.far *= 2;
+
+    new PhotoSphereViewer.utils.Animation({
+      properties: {
+        lat: { start: -Math.PI / 2, end: 0.2 },
+        long: { start: Math.PI, end: 0 },
+        zoom: { start: 0, end: 50 },
+        fisheye: { start: 4, end: 0 },
+      },
+      duration: 2000,
+      easing: 'inOutQuad',
+      onTick: (properties) => {
+        viewer.setOption('fisheye', properties.fisheye);
+        viewer.rotate({ longitude: properties.long, latitude: properties.lat });
+        viewer.zoom(properties.zoom);
+      }
+    });
+  }
+</script>
